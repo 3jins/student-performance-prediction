@@ -1,0 +1,6 @@
+certifi==2018.10.15
+mkl-fft==1.0.6
+mkl-random==1.0.1
+numpy==1.15.4
+scipy==1.1.0
+wincertstore==0.2

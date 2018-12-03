@@ -1,2 +1,26 @@
 # student-performance-prediction
-건국대 인공지능 수업 실습
+
+A neural network model for prediction of the grades
+
+
+
+## Data Set
+
+[UCI Student Performance Data Set](https://archive.ics.uci.edu/ml/datasets/Student+Performance)
+
+
+
+## Preparation
+
+### Installation
+
+```
+pip3 install -r requirements.txt
+```
+
+### Start
+
+```
+python3 src/main.py
+```
+
