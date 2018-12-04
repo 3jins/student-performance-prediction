@@ -206,3 +206,6 @@ dmypy.json
 
 # Ignore data files
 data
+
+# Ignore test files
+experimental
