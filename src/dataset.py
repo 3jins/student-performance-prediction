@@ -104,18 +104,16 @@ class StudentData(torch.utils.data.Dataset):
                 attributes = student.split(';')
                 targets = attributes[-3:]
                 attributes = attributes[:-3]
-                student_attributes = []
                 for idx, attribute in enumerate(attributes):
                     map = self.data_map[idx]
                     if map == 'numeric':
-                        student_attributes.append(int(attribute))
+                        attributes[idx] = int(attribute)
                     else:
-                        student_attributes.append(map[attribute])
-                student_targets = []
-                for target in targets:
-                    student_targets.append(int(target))
-                preprocessed[mode]['attributes'].append(student_attributes)
-                preprocessed[mode]['targets'].append(student_targets)
+                        attributes[idx] = map[attribute]
+                for idx, target in enumerate(targets):
+                    targets[idx] = int(target)
+                preprocessed[mode]['attributes'].append(torch.Tensor(attributes))
+                preprocessed[mode]['targets'].append(torch.Tensor(targets))
 
         try:
             os.mkdir(self.loaded_data_path)

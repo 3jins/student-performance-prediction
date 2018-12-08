@@ -1,3 +1,5 @@
+import torch
+
 class SingletonInstance:
     _instance = None
 
@@ -17,15 +19,17 @@ class Config(SingletonInstance):
     """
 
     def __init__(self):
+        # General
+        self.IS_TRAINING_MODE = True    # Otherwise evaluation mode
+
         # Train
         self.LEARNING_RATE = 0.01
-        self.MAX_EPOCH = 100
+        self.MAX_EPOCH = 300
         self.BATCH_SIZE = 32
-        # self.CRITERION = torch.nn.CrossEntropyLoss()
 
         # Model
         self.INPUT_SIZE = 30
-        self.HIDDEN_SIZE = [512]
+        self.HIDDEN_SIZES = [128]
         self.OUTPUT_SIZE = 3
 
         # Data
