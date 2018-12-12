@@ -31,7 +31,9 @@ class Trainer(object):
                 loss = self.criterion(output, target)
                 loss.backward()
                 self.optimizer.step()
-                accuracy_sums = [x + y for x, y in zip(accuracy_sums, self._get_accuracies(target, output))]
+                accuracy_sums = [
+                    x + y for x, y in zip(accuracy_sums, self._get_accuracies(target, output, strict_mode=True))
+                ]
                 accuracy_sum_cnt += 1
             if epoch % accuracy_print_frequency == 0:
                 self._print_accuracy(accuracy_sums, epoch, accuracy_sum_cnt)
@@ -46,10 +48,13 @@ class Trainer(object):
     def evaluate(self):
         raise NotImplementedError
 
-    def _get_accuracies(self, target, output):
-        max_output = 20
+    def _get_accuracies(self, target, output, strict_mode):
         errors = list(map(lambda val1, val2: abs(val1 - val2), target, output))
-        return list((max_output - error) / max_output for error in errors)[0]
+        if strict_mode:
+            return list((float(abs(error) < 1) for error in errors[0]))
+        else:
+            max_output = 20
+            return list((max_output - error) / max_output for error in errors)[0]
 
     # TODO(3jin): Make it to adapt to the output size
     def _print_accuracy(self, accuracy_sums, epoch, accuracy_sum_cnt):
