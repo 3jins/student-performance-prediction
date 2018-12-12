@@ -19,12 +19,9 @@ class Config(SingletonInstance):
     """
 
     def __init__(self):
-        # General
-        self.IS_TRAINING_MODE = True    # Otherwise evaluation mode
-
         # Train
         self.LEARNING_RATE = 0.01
-        self.MAX_EPOCH = 300
+        self.MAX_EPOCH = 500
         self.BATCH_SIZE = 32
 
         # Model

@@ -8,12 +8,11 @@ class StudentDataLoader(torch.utils.data.DataLoader):
     config = Config.instance()
     data_root = '../data'
 
-    def __init__(self, batch_size, train=True, debug_mode=False, subject='mat', ):
+    def __init__(self, batch_size, is_training_mode, subject='mat'):
         self.data = StudentData(
             data_root=self.data_root,
-            train=train,
-            debug_mode=debug_mode,
-            subject=subject
+            subject=subject,
+            is_training_mode=is_training_mode,
         )
         self.cuda = torch.cuda.is_available()
         additional_options = {'num_workers': 4, 'pin_memory': True} if self.cuda else {}

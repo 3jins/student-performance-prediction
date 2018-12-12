@@ -41,7 +41,7 @@ class StudentData(torch.utils.data.Dataset):
         'numeric',
     ]
 
-    def __init__(self, data_root, train, debug_mode, subject):
+    def __init__(self, data_root, subject, is_training_mode):
         self.data_root = os.path.expanduser(data_root)
 
         if not self.helper.check_path_exists(self.data_root):
@@ -68,13 +68,10 @@ class StudentData(torch.utils.data.Dataset):
             print("[!] Subject must be `mat` or `por`. There is no option `" + subject + "`")
             return
 
-        self.train = train
-        self.debug_mode = debug_mode
-
         if not self.helper.check_path_exists(self.loaded_data_path):
             self.preprocess()
 
-        if self.train:
+        if is_training_mode:
             self.loaded_data = torch.load(self.training_file)
         else:
             self.loaded_data = torch.load(self.test_file)
