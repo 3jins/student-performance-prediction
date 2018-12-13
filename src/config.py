@@ -30,6 +30,7 @@ class Config(SingletonInstance):
         self.OUTPUT_SIZE = 3
 
         # Data
+        self.SUBJECT = 'por'
         self.MAT_TEST_SET_SIZE = 50
         self.POR_TEST_SET_SIZE = 100
         self.SHUFFLE = True

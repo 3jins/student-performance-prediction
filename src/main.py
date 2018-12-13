@@ -9,7 +9,7 @@ if __name__ == '__main__':
 
     training_data = StudentData(
         data_root='../data',
-        subject='mat',
+        subject=config.SUBJECT,
         is_training_mode=True,
     )
     training_model = NNModel(is_training_mode=True)
@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     test_data = StudentData(
         data_root='../data',
-        subject='mat',
+        subject=config.SUBJECT,
         is_training_mode=False,
     )
     test_model = NNModel(is_training_mode=False)
