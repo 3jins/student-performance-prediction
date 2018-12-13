@@ -1,5 +1,6 @@
 import os
 import time
+import math
 import torch
 import numpy as np
 from config import Config
@@ -93,15 +94,27 @@ class Evaluator(DataExplorer):
                 data, target = data.to(device=self.device), target.to(device=self.device)
                 self.optimizer.zero_grad()  # Initialize gradients
                 output = self.model(data)
-                accuracies = np.array(self._get_accuracies(target, output, strict_mode=True))
+                accuracies = np.array(self._get_accuracies(target, output, strict_mode=False))
                 accuracies = list(map(np.sum, np.transpose(accuracies)))
                 accuracy_sums = np.add(accuracy_sums, accuracies)
 
+        rmse = self._get_rmse_list(target, output)
         mean_accuracies = list(
             float('%.3f' % (accuracy_sum / len(self.data_loader.data))) for accuracy_sum in accuracy_sums
         )
         print("Evaluation is done!")
         print("Total Accuracies:", mean_accuracies)
+        print("RMSE:", rmse)
+
+    def _get_rmse_list(self, target, output):
+        print(type(output))
+        output = torch.t(output)
+        target = torch.t(target)
+        output_size = self.config.OUTPUT_SIZE
+        rmse_list = []
+        for i in range(output_size):
+            rmse_list.append(float('%.3f' % math.sqrt(self.criterion(output[i], target[i]))))
+        return rmse_list
 
     def _get_accuracies(self, target, output, strict_mode):
         accuracies = []
@@ -111,5 +124,5 @@ class Evaluator(DataExplorer):
                 accuracies.append(list((float(abs(error) < 1) for error in errors)))
             else:
                 max_output = 20
-                accuracies.append(list((max_output - error) / max_output for error in errors)[0])
+                accuracies.append(list((1 - error / max_output) for error in errors))
         return accuracies
