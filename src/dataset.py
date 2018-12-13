@@ -44,8 +44,8 @@ class StudentData(torch.utils.data.Dataset):
     def __init__(self, data_root, subject, is_training_mode):
         self.data_root = os.path.expanduser(data_root)
 
-        if not self.helper.check_path_exists(self.data_root):
-            print(self.helper.check_path_exists(self.data_root))
+        if not os.path.exists(self.data_root):
+            print(os.path.exists(self.data_root))
             print(
                 "[!] There is no data path! Download data from "
                 "`https://archive.ics.uci.edu/ml/machine-learning-databases/00320/student.zip`"
@@ -57,18 +57,18 @@ class StudentData(torch.utils.data.Dataset):
         if subject is 'mat':
             self.csv_data_file = os.path.join(self.data_root, 'student-mat.csv')
             self.test_set_size = self.config.MAT_TEST_SET_SIZE
-            self.training_file = os.path.join(self.loaded_data_path, 'trianing-mat.pt')
+            self.training_file = os.path.join(self.loaded_data_path, 'training-mat.pt')
             self.test_file = os.path.join(self.loaded_data_path, 'test-mat.pt')
         elif subject is 'por':
             self.csv_data_file = os.path.join(self.data_root, 'student-por.csv')
             self.test_set_size = self.config.POR_TEST_SET_SIZE
-            self.training_file = os.path.join(self.loaded_data_path, 'trianing-por.pt')
+            self.training_file = os.path.join(self.loaded_data_path, 'training-por.pt')
             self.test_file = os.path.join(self.loaded_data_path, 'test-por.pt')
         else:
             print("[!] Subject must be `mat` or `por`. There is no option `" + subject + "`")
             return
 
-        if not self.helper.check_path_exists(self.loaded_data_path):
+        if not self._is_data_loaded(subject):
             self.preprocess()
 
         if is_training_mode:
@@ -122,6 +122,15 @@ class StudentData(torch.utils.data.Dataset):
             torch.save(preprocessed['test'], f)
 
         print("Preprocessing is done!")
+
+    def _is_data_loaded(self, subject):
+        if not os.path.exists(self.loaded_data_path):
+            return False
+        for root, dirs, files in os.walk(self.loaded_data_path):
+            for file in files:
+                if file.endswith(subject + '.pt'):
+                    return True
+        return False
 
     def __getitem__(self, index):
         return self.loaded_data['attributes'][index], self.loaded_data['targets'][index]
