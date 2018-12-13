@@ -3,21 +3,27 @@ import time
 import torch
 import numpy as np
 from config import Config
+from data_loader import StudentDataLoader
+from model import NNModel
 from helper import Helper
 
 
-class Trainer(object):
+class DataExplorer(object):
     config = Config.instance()
     helper = Helper()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    checkpoint_path = '../data/checkpoints'
+    checkpoint_path = os.path.join('..', 'data', 'checkpoints')
 
-    def __init__(self, model, data_loader):
-        self.data_loader = data_loader
-        self.model = model
-        self.checkpoint_file = model.__class__.__name__ + '_' + str(int(time.time())) + '.pt'
+    def __init__(self, training_mode):
+        self.data_loader = StudentDataLoader(
+            batch_size=self.config.BATCH_SIZE,
+            subject=self.config.SUBJECT,
+            training_mode = training_mode,
+        )
+        self.model = NNModel(training_mode)
+        self.checkpoint_file = self.model.__class__.__name__ + '_' + str(int(time.time())) + '.pt'
         self.optimizer = torch.optim.SGD(
-            params=model.parameters(),
+            params=self.model.parameters(),
             lr=self.config.LEARNING_RATE,
             # weight_decay=self.config.WEIGHT_DECAY,
         )
@@ -42,6 +48,11 @@ class Trainer(object):
         print("[+] Loaded a checkpoint:", loaded_file)
         return torch.load(os.path.join(root, loaded_file))
 
+
+class Trainer(DataExplorer):
+    def __init__(self):
+        super(__class__, self).__init__(True)
+
     def train(self, max_epoch, accuracy_print_frequency=50):
         print("Start training...")
         for epoch in range(max_epoch):
@@ -61,12 +72,16 @@ class Trainer(object):
                 print("Training is ongoing... ({} / {})".format(epoch, max_epoch))
         print("Training is done!")
 
+
+class Evaluator(DataExplorer):
+    def __init__(self):
+        super(__class__, self).__init__(False)
+
     def evaluate(self):
         print("Start evaluation...")
         checkpoint_info = self.load_checkpoint()
         if checkpoint_info is False:
             return
-        epoch = checkpoint_info['epoch']
         optimizer_state = checkpoint_info['optimizer_state']
         model_state = checkpoint_info['model_state']
         self.optimizer.load_state_dict(optimizer_state)
@@ -81,7 +96,10 @@ class Trainer(object):
                 accuracies = np.array(self._get_accuracies(target, output, strict_mode=True))
                 accuracies = list(map(np.sum, np.transpose(accuracies)))
                 accuracy_sums = np.add(accuracy_sums, accuracies)
-        mean_accuracies = list(float('%.3f' % (accuracy_sum / len(self.data_loader.data))) for accuracy_sum in accuracy_sums)
+
+        mean_accuracies = list(
+            float('%.3f' % (accuracy_sum / len(self.data_loader.data))) for accuracy_sum in accuracy_sums
+        )
         print("Evaluation is done!")
         print("Total Accuracies:", mean_accuracies)
 

@@ -41,7 +41,7 @@ class StudentData(torch.utils.data.Dataset):
         'numeric',
     ]
 
-    def __init__(self, data_root, subject, is_training_mode):
+    def __init__(self, data_root, subject, training_mode):
         self.data_root = os.path.expanduser(data_root)
 
         if not os.path.exists(self.data_root):
@@ -71,7 +71,7 @@ class StudentData(torch.utils.data.Dataset):
         if not self._is_data_loaded(subject):
             self.preprocess()
 
-        if is_training_mode:
+        if training_mode:
             self.loaded_data = torch.load(self.training_file)
         else:
             self.loaded_data = torch.load(self.test_file)

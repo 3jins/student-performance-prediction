@@ -5,12 +5,13 @@ from config import Config
 
 class NNModel(nn.Module):
     config = Config.instance()
+    training_mode = True
 
-    def __init__(self, is_training_mode):
+    def __init__(self, training_mode):
         super(NNModel, self).__init__()
         self.cuda = torch.cuda.is_available()
         self.device = torch.device('cuda' if self.cuda else 'cpu')
-        self.is_training_mode = is_training_mode
+        self.training_mode = training_mode
         # Names must be fc1, fc2. Otherwise, `torch.nn.parameters` cannot find them.
         self.fc1 = nn.Linear(self.config.INPUT_SIZE, self.config.HIDDEN_SIZES[0])
         self.fc2 = nn.Linear(self.config.HIDDEN_SIZES[0], self.config.OUTPUT_SIZE)
